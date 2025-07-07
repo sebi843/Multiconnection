@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MultiConnection - Plataforma para Programadores, Jugadores y Creadores</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  /* Reset & base */
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  header {
+    background: rgba(21, 44, 85, 0.8);
+    padding: 3rem 1rem 4rem;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.55);
+    z-index: 100;
+  }
+  header h1 {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    color: #00ffd5;
+    text-shadow: 0 0 12px rgba(0,255,213,0.6);
+    margin-bottom: 0.5rem;
+  }
+  header p {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    max-width: 720px;
+    margin: 0 auto;
+    font-weight: 500;
+    color: #a7dbe9;
+  }
+  nav {
+    background: #0f2346;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1.2rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 110;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.8);
+    flex-wrap: wrap;
+  }
+  nav a {
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: #98f0ea;
+  }
+  nav a:hover, nav a:focus-visible {
+    background: #00ffd5;
+    color: #000;
+    outline-offset: 3px;
+    outline: 3px solid #00ffd5;
+  }
+  main {
+    max-width: 1080px;
+    margin: 4rem auto 6rem;
+    padding: 0 1.5rem;
+    flex: 1;
+  }
+  section {
+    margin-bottom: 5rem;
+  }
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: #00ffd5;
+    margin-bottom: 1.5rem;
+    border-bottom: 4px solid #00ffd5;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    text-shadow: 0 0 12px rgba(0,255,213,0.6);
+  }
+  p, li {
+    font-size: 1.125rem;
+    color: #d0f0ec;
+  }
+  ul, ol {
+    padding-left: 1.5rem;
+    margin-top: 1rem;
+  }
+  ul li {
+    margin-bottom: 1rem;
+    position: relative;
+    list-style: none;
+  }
+  ul li::before {
+    content: "✓";
+    position: absolute;
+    left: -1.2rem;
+    top: 0.15rem;
+    color: #00ffd5;
+    font-weight: 900;
+    font-size: 1.25rem;
+    text-shadow: 0 0 6px rgba(0,255,213,0.7);
+  }
+  ol li {
+    margin-bottom: 1rem;
+    color: #a3e7e1;
+  }
+  /* Buttons */
+  .btn-primary {
+    background: #ffdd57;
+    color: #000;
+    font-weight: 700;
+    padding: 1rem 3.5rem;
+    border-radius: 50px;
+    font-size: 1.25rem;
+    box-shadow: 0 0 30px rgba(255, 221, 87, 0.8);
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    display: inline-block;
+    margin-top: 1.5rem;
+  }
+  .btn-primary:hover, .btn-primary:focus-visible {
+    background: #e6c847;
+    box-shadow: 0 0 45px rgba(255, 221, 87, 1);
+    outline-offset: 3px;
+    outline: 3px solid #ffdd57;
+  }
+  /* Form */
+  form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: rgba(18, 53, 79, 0.85);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 0 28px rgba(0,255,213,0.7);
+    color: #c0f3eb;
+  }
+  label {
+    display: block;
+    font-weight: 700;
+    margin-top: 1.25rem;
+    font-size: 1.125rem;
+  }
+  input[type="file"],
+  input[type="text"],
+  input[type="email"],
+  textarea {
+    margin-top: 0.5rem;
+    background: #1b4d70;
+    padding: 0.8rem 1rem;
+    border-radius: 14px;
+    cursor: pointer;
+    width: 100%;
+    color: #def7f5;
+    font-size: 1rem;
+    border: none;
+    font-family: inherit;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+  input[type="file"]::-webkit-file-upload-button {
+    cursor: pointer;
+  }
+  #upload-status {
+    margin-top: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #00ffd5;
+  }
+  /* Dashboard simple */
+  #dashboard {
+    background: rgba(0, 47, 75, 0.67);
+    padding: 2rem 2.5rem;
+    border-radius: 18px;
+    box-shadow: 0 0 50px rgba(0,255,213,0.8);
+    color: #b3f4e5;
+    max-width: 700px;
+    margin: 0 auto 5rem;
+  }
+  #dashboard h3 {
+    color: #00ffd5;
+    margin-bottom: 1.25rem;
+  }
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.3rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+    flex: 1 1 150px;
+  }
+  .stat span {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #ffdd57;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 12px rgba(255, 221, 87, 0.7);
+  }
+  /* Seguridad */
+  #seguridad ul li::before {
+    content: "🔒";
+    margin-right: 0.6rem;
+    font-size: 1.7rem;
+    vertical-align: middle;
+  }
+  /* Eslogan dinámico */
+  .eslogan {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #00ffd5;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-style: italic;
+    text-shadow: 0 0 10px rgba(0,255,213,0.5);
+  }
+  /* Relleno extras */
+  #extras {
+    background: #0a1f3a;
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: inset 0 0 28px rgba(0,255,213,0.7);
+    max-width: 900px;
+    margin: 0 auto 5rem;
+    color: #b3f4e5;
+  }
+  #extras h3 {
+    color: #00ffd5;
+    margin-bottom: 1rem;
+  }
+  #extras ul li {
+    margin-bottom: 0.9rem;
+  }
+  /* Imágenes */
+  .section-image {
+    max-width: 100%;
+    margin: 2rem auto 3rem;
+    display: block;
+    border-radius: 18px;
+    box-shadow: 0 0 30px rgba(0,255,213,0.7);
+  }
+  /* Música */
+  #music-controls {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: rgba(18, 53, 79, 0.9);
+    padding: 0.8rem 1.2rem;
+    border-radius: 50px;
+    box-shadow: 0 0 20px rgba(0,255,213,0.8);
+    color: #00ffd5;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  #music-controls:hover,
+  #music-controls:focus-visible {
+    background: #00ffd5dd;
+    color: #00222f;
+    outline-offset: 3px;
+    outline: 3px solid #00ffd5;
+  }
+  /* Responsive */
+  @media (max-width: 720px) {
+    nav {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .stats {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header role="banner">
+  <h1>MultiConnection</h1>
+  <p class="eslogan" id="headerEslogan">Conecta y crece</p>
+  <p>La plataforma web donde programadores ganan, jugadores disfrutan y nuevos talentos crecen juntos.</p>
+</header>
+
+<nav role="navigation" aria-label="Menú principal">
+  <a href="#que-es">¿Qué es?</a>
+  <a href="#beneficios">Beneficios</a>
+  <a href="#como-funciona">Cómo funciona</a>
+  <a href="#subir-archivo">Subí tu archivo</a>
+  <a href="#dashboard">Dashboard</a>
+  <a href="#monetizacion">Monetización</a>
+  <a href="#extras">Extras</a>
+  <a href="#seguridad">Seguridad</a>
+  <a href="#faq">Preguntas</a>
+  <a href="#contacto">Contacto</a>
+</nav>
+
+<main role="main">
+  <section id="que-es" tabindex="-1">
+    <h2>¿Qué es MultiConnection?</h2>
+    <p class="eslogan">Conecta y gana</p>
+    <img class="section-image" src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80" alt="Programadores colaborando en un proyecto" />
+    <p><strong>MultiConnection</strong> es una plataforma 100% web que conecta programadores, jugadores y nuevos talentos. Podés subir tu app en cualquier lenguaje, promover tu proyecto y ganar dinero, mientras aprendés o disfrutás jugando.</p>
+  </section>
+
+  <section id="beneficios" tabindex="-1">
+    <h2>Beneficios Exclusivos</h2>
+    <p class="eslogan">Conecta y juega</p>
+    <img class="section-image" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80" alt="Jugadores disfrutando juegos en grupo" />
+    <ul>
+      <li>Monetización automática y transparente.</li>
+      <li>Acceso a recursos exclusivos como IA y promoción personalizada.</li>
+      <li>Comunidad activa y eventos periódicos para potenciar tu crecimiento.</li>
+      <li>Recompensas para jugadores que usan las apps con frecuencia.</li>
+      <li>Soporte constante y herramientas para aprender y mejorar.</li>
+      <li>Sistema de versiones para mantener control y mejoras continuas.</li>
+      <li>Privacidad y protección de propiedad intelectual.</li>
+    </ul>
+  </section>
+
+  <section id="como-funciona" tabindex="-1">
+    <h2>¿Cómo funciona?</h2>
+    <p class="eslogan">Conecta y depende</p>
+    <img class="section-image" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" alt="Proceso de desarrollo de software" />
+    <ol>
+      <li>Elegí tu rol: Programador, Aprendiz o Jugador.</li>
+      <li>Subí tu archivo final con seguridad y control de versiones.</li>
+      <li>Jugadores disfrutan las apps y reciben beneficios exclusivos.</li>
+      <li>Vos ganás dinero con la monetización integrada y referidos.</li>
+    </ol>
+  </section>
+
+  <section id="subir-archivo" tabindex="-1">
+    <h2>Subí tu archivo sin complicaciones</h2>
+    <p>Solo subí el archivo final de tu proyecto, en cualquier lenguaje o formato compatible. Nuestro sistema:</p>
+    <ul>
+      <li>Escanea automáticamente para seguridad y calidad.</li>
+      <li>Te muestra el estado del análisis en tiempo real.</li>
+      <li>Guarda versiones para que puedas mejorar sin perder datos.</li>
+      <li>Protege tus derechos y propiedad intelectual.</li>
+    </ul>
+
+    <form id="uploadForm" aria-label="Formulario para subir archivo">
+      <label for="fileUpload">Selecciona tu archivo:</label>
+      <input type="file" id="fileUpload" name="fileUpload" required aria-required="true" />
+      <div id="upload-status" role="status" aria-live="polite"></div>
+      <button type="submit" class="btn-primary">Subir archivo</button>
+    </form>
+  </section>
+
+  <section id="dashboard" tabindex="-1">
+    <h2>Dashboard para Programadores</h2>
+    <p class="eslogan">Conecta y controla</p>
+    <img class="section-image" src="https://images.unsplash.com/photo-1517433456452-f9633a875f6f?auto=format&fit=crop&w=800&q=80" alt="Dashboard de datos en computadora" />
+    <div id="dashboard-content" role="region" aria-label="Estadísticas de proyectos">
+      <h3>Estadísticas de tus proyectos</h3>
+      <div class="stats">
+        <div class="stat" tabindex="0">
+          <span>15</span>
+          Apps Subidas
+        </div>
+        <div class="stat" tabindex="0">
+          <span>1200</span>
+          Usuarios Activos
+        </div>
+        <div class="stat" tabindex="0">
+          <span>$450</span>
+          Ganancias
+        </div>
+      </div>
+      <p>Recibí feedback, revisá reportes y accedé a herramientas IA para mejorar tus apps.</p>
+      <button class="btn-primary">Acceder a IA y Recursos Premium</button>
+    </div>
+  </section>
+
+  <section id="monetizacion" tabindex="-1">
+    <h2>Monetización Inteligente</h2>
+    <p class="eslogan">Conecta y gana más</p>
+    <img class="section-image" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80" alt="Gráficos de crecimiento económico" />
+    <ul>
+      <li>Comisiones justas por ingresos generados con tus apps.</li>
+      <li>Membresías premium con recursos avanzados.</li>
+      <li>Sistema de referidos para que ganes más invitando a otros.</li>
+      <li>Venta de publicidad y promoción cruzada entre apps.</li>
+      <li>Eventos y torneos especiales con premios para programadores y jugadores.</li>
+    </ul>
+  </section>
+
+  <section id="extras" tabindex="-1">
+    <h2>Extras y Comunidad</h2>
+    <p class="eslogan">Conecta y aprende</p>
+    <div id="extras">
+      <h3>Recursos para crecer</h3>
+      <ul>
+        <li>Acceso a tutoriales exclusivos para todos los niveles.</li>
+        <li>Charlas en vivo con expertos del mundo de la programación y desarrollo de juegos.</li>
+        <li>Foros activos para resolver dudas y compartir ideas.</li>
